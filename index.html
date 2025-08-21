@@ -1,447 +1,417 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Expense Tracker – Single File</title>
+  <title>Expense Tracker</title>
   <style>
-    :root {
-      --bg: #0f172a;          /* slate-900 */
-      --panel: #111827;       /* gray-900 */
-      --panel-2: #0b1220;    
-      --text: #e5e7eb;        /* gray-200 */
-      --muted: #9ca3af;       /* gray-400 */
-      --primary: #6366f1;     /* indigo-500 */
-      --primary-2: #818cf8;   /* indigo-400 */
-      --danger: #ef4444;      /* red-500 */
-      --ok: #10b981;          /* emerald-500 */
-      --warn: #f59e0b;        /* amber-500 */
-      --radius: 14px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    :root{
+      --bg: #0f1220;
+      --card: #171a2b;
+      --accent: #6c7cff;
+      --accent-2:#22d3ee;
+      --text: #e6e8f0;
+      --muted: #98a2b3;
+      --danger:#ef4444;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --ring: rgba(108,124,255,.35);
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 10% -10%, #1e293b 0, transparent 70%),
-                  radial-gradient(1200px 800px at 110% 10%, #1f2937 0, transparent 60%),
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(34,211,238,.15), transparent 45%),
+                  radial-gradient(1000px 700px at 90% 0%, rgba(108,124,255,.15), transparent 50%),
                   var(--bg);
-      color: var(--text);
+      color:var(--text);
     }
-    .container { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
-    .app-title { font-size: clamp(20px, 4vw, 28px); font-weight: 800; letter-spacing: .3px; display:flex; align-items:center; gap:10px; }
-    .badge { font-size: 12px; padding: 3px 8px; border: 1px solid #303a53; border-radius: 999px; color: var(--primary-2); background: #0b1020; }
+    .container{ max-width:1100px; margin:0 auto; padding:24px; }
 
-    .grid {
-      display:grid; gap:16px; grid-template-columns: 1fr;
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-bottom:16px;
     }
-    @media (min-width: 900px){ .grid { grid-template-columns: 380px 1fr; } }
-
-    .card { background: linear-gradient(180deg, var(--panel) 0, var(--panel-2)); border: 1px solid #192038; border-radius: var(--radius); box-shadow: var(--shadow); }
-    .card h2 { margin: 0 0 10px; font-size: 16px; letter-spacing: .3px; color: #c7d2fe; }
-    .card-inner { padding: 16px; }
-
-    label { display:block; font-size: 12px; color: var(--muted); margin: 8px 0 6px; }
-    input, select, textarea {
-      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #26314d; background: #0b1020; color: var(--text);
-      outline: none; transition: border .15s ease;
+    .title{
+      display:flex; align-items:center; gap:12px;
     }
-    input:focus, select:focus, textarea:focus { border-color: #4452a3; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-    .actions { display:flex; gap:8px; flex-wrap: wrap; margin-top: 14px; }
-    button, .btn {
-      display:inline-flex; align-items:center; gap:8px; padding: 10px 14px; border-radius: 10px; border: 1px solid #2b3558; background:#141b31; color: var(--text);
-      cursor:pointer; transition: transform .02s ease, background .2s ease, border .2s ease; font-weight: 600; letter-spacing:.2px;
+    .logo{
+      width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid; place-items:center; color:white; font-weight:800; box-shadow:0 10px 30px rgba(108,124,255,.25);
     }
-    button:hover { background:#1a2342; }
-    button:active { transform: translateY(1px); }
-    .btn-primary { background: linear-gradient(180deg, #3f46c8, #373ec0); border-color:#5258da; }
-    .btn-primary:hover { background: linear-gradient(180deg, #4e56e5, #4249cf); }
-    .btn-danger { background: linear-gradient(180deg, #b52e2e, #962525); border-color:#d64545; }
-    .btn-ghost { background: transparent; border-color:#2b3558; }
+    .appname{ font-size: clamp(1.25rem, 1vw + 1rem, 1.8rem); font-weight:800; letter-spacing:.2px }
+    .sub{ color:var(--muted); font-size:.95rem }
 
-    .stats { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:6px; }
-    .stat { padding: 12px; border-radius: 12px; border: 1px solid #223057; background:#0a0f1f; }
-    .stat .label { font-size: 12px; color: var(--muted); }
-    .stat .value { font-size: 18px; font-weight: 800; margin-top: 2px; }
+    /* Cards */
+    .grid{ display:grid; grid-template-columns: 1fr; gap:16px }
+    @media (min-width: 880px){ .grid{ grid-template-columns: 1.2fr .8fr } }
 
-    table { width: 100%; border-collapse: collapse; }
-    thead th { text-align:left; font-size: 12px; color: var(--muted); padding: 10px; border-bottom: 1px solid #1f2947; position: sticky; top: 0; background: #0b1020; }
-    tbody td { padding: 10px; border-bottom: 1px solid #151c34; font-size: 14px; }
-    tbody tr:hover { background: rgba(99,102,241,.06); }
-    .t-actions { display:flex; gap:8px; }
-    .empty { text-align:center; color: var(--muted); padding: 24px; }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 60%), var(--card);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 20px; padding:18px; box-shadow: 0 10px 40px rgba(0,0,0,.25);
+      backdrop-filter: blur(6px);
+    }
+    .card h3{ margin:0 0 10px; font-size:1.05rem; letter-spacing:.2px }
+    .muted{ color:var(--muted) }
 
-    .pill { padding: 2px 8px; border-radius: 999px; border: 1px solid #2b3558; font-size: 12px; color:#c7d2fe; background:#0b1020; }
-    .footer { color: var(--muted); font-size: 12px; margin-top: 16px; text-align:center; }
+    /* Budget bar */
+    .bar{ height:12px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
+    .bar > div{ height:100%; width:0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .4s ease }
+
+    /* Inputs */
+    .row{ display:grid; grid-template-columns: 1fr; gap:10px }
+    @media (min-width: 620px){ .row{ grid-template-columns: repeat(4, 1fr); } }
+
+    .field{ display:flex; flex-direction:column; gap:6px }
+    label{ font-size:.85rem; color:var(--muted) }
+    input, select, button, textarea{
+      font: inherit; color:inherit;
+    }
+    input, select{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:#0e1020; outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    input:focus, select:focus{
+      border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring);
+    }
+    .btn{
+      padding:12px 16px; border-radius:12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border:none; color:white; font-weight:700; cursor:pointer;
+      box-shadow: 0 10px 25px rgba(108,124,255,.35); transition: transform .05s ease; align-self:end
+    }
+    .btn:active{ transform: translateY(1px) }
+    .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--text); box-shadow:none }
+
+    /* Table */
+    table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+    thead th{ text-align:left; color:var(--muted); font-weight:600; font-size:.85rem; padding:0 10px }
+    tbody tr{ background:#0e1020; border:1px solid rgba(255,255,255,.06); }
+    tbody td{ padding:12px 10px; }
+    tbody tr{ border-radius:14px; }
+    tbody tr td:first-child{ border-top-left-radius:14px; border-bottom-left-radius:14px }
+    tbody tr td:last-child{ border-top-right-radius:14px; border-bottom-right-radius:14px }
+    .tag{ padding:.25rem .55rem; border-radius:999px; font-size:.75rem; border:1px solid rgba(255,255,255,.12); color:#dbeafe }
+    .actions{ display:flex; gap:8px }
+    .iconbtn{ background:transparent; border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:6px 10px; cursor:pointer }
+
+    /* Top summary cards */
+    .stats{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin:10px 0 0 }
+    .pill{ font-weight:700 }
+    .ok{ color:var(--success) }
+    .warn{ color:var(--warning) }
+    .bad{ color:var(--danger) }
+
+    /* Toast / alerts */
+    .toast{
+      position: fixed; top: 20px; right: 20px; z-index: 50; min-width: 260px;
+      padding:12px 14px; border-radius:14px; background: #0e1020; border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 15px 35px rgba(0,0,0,.45); display:none
+    }
+    .toast.show{ display:block; animation: slideIn .25s ease }
+    .toast h4{ margin:0 0 2px; font-size:.95rem }
+    .toast p{ margin:0; font-size:.85rem; color:var(--muted) }
+    .toast.danger{ border-color: rgba(239,68,68,.45) }
+    .toast.success{ border-color: rgba(34,197,94,.45) }
+
+    @keyframes slideIn{ from{ transform: translateY(-8px); opacity:0 } to{ transform:none; opacity:1 } }
+
+    /* Utility */
+    .flex{ display:flex; align-items:center; gap:10px }
+    .spacer{ flex:1 }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="app-title">💸 Expense Tracker <span class="badge">Single‑file • localStorage</span></div>
-
-    <div class="grid" role="region" aria-label="Expense tracker panels">
-      <!-- Left: Form & Filters -->
-      <section class="card" aria-labelledby="form-title">
-        <div class="card-inner">
-          <h2 id="form-title">Add / Edit Expense</h2>
-          <form id="expense-form">
-            <input type="hidden" id="expense-id" />
-            <label for="amount">Amount</label>
-            <input id="amount" type="number" step="0.01" min="0" placeholder="e.g. 15.50" required />
-
-            <div class="row">
-              <div>
-                <label for="category">Category</label>
-                <input id="category" list="category-list" placeholder="e.g. Food" required />
-                <datalist id="category-list"></datalist>
-              </div>
-              <div>
-                <label for="date">Date</label>
-                <input id="date" type="date" required />
-              </div>
-            </div>
-
-            <label for="description">Description (optional)</label>
-            <input id="description" type="text" maxlength="120" placeholder="e.g. Lunch with team" />
-
-            <div class="actions">
-              <button type="submit" class="btn-primary" id="save-btn">Save Expense</button>
-              <button type="reset" class="btn-ghost" id="reset-btn">Reset</button>
-            </div>
-          </form>
-
-          <hr style="border:none; border-top:1px solid #1f2947; margin:18px 0;">
-
-          <h2>Filters</h2>
-          <div class="row-3">
-            <div>
-              <label for="filter-category">Category</label>
-              <select id="filter-category"></select>
-            </div>
-            <div>
-              <label for="from">From</label>
-              <input id="from" type="date" />
-            </div>
-            <div>
-              <label for="to">To</label>
-              <input id="to" type="date" />
-            </div>
-          </div>
-          <div class="actions">
-            <button id="apply-filters" class="btn">Apply Filters</button>
-            <button id="clear-filters" class="btn-ghost">Clear</button>
-            <button id="export-csv" class="btn">Export CSV</button>
-            <label class="btn-ghost" style="position:relative; overflow:hidden;">
-              Import JSON
-              <input id="import-json" type="file" accept="application/json" style="position:absolute; inset:0; opacity:0; cursor:pointer;" />
-            </label>
-          </div>
-
-          <div class="stats" aria-live="polite">
-            <div class="stat"><div class="label">This Period</div><div id="sum-period" class="value">₹0.00</div></div>
-            <div class="stat"><div class="label">All‑time Total</div><div id="sum-all" class="value">₹0.00</div></div>
-            <div class="stat"><div class="label">Entries</div><div id="count" class="value">0</div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right: Table & Summary -->
-      <section class="card" aria-labelledby="table-title">
-        <div class="card-inner" style="padding-bottom:0;">
-          <h2 id="table-title">Expenses</h2>
-          <div style="max-height: 420px; overflow:auto; border:1px solid #171f39; border-radius: 12px;">
-            <table aria-describedby="table-title">
-              <thead>
-                <tr>
-                  <th style="width:120px">Date</th>
-                  <th style="width:110px">Amount</th>
-                  <th style="width:160px">Category</th>
-                  <th>Description</th>
-                  <th style="width:150px">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="tbody">
-                <tr><td colspan="5" class="empty">No expenses yet. Add your first one on the left ➡️</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="card-inner">
-            <h2>Monthly Summary</h2>
-            <div id="monthly" class="stats" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
-            <div class="footer">Data is stored locally in your browser (localStorage). Export regularly for backups.</div>
-          </div>
-        </div>
-      </section>
-    </div>
+  <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <h4 id="toastTitle">Heads up</h4>
+    <p id="toastMsg">Your message appears here.</p>
   </div>
 
-  <template id="row-template">
-    <tr>
-      <td data-key="date"></td>
-      <td data-key="amount"></td>
-      <td data-key="category"></td>
-      <td data-key="description"></td>
-      <td>
-        <div class="t-actions">
-          <button class="btn-ghost" data-action="edit">Edit</button>
-          <button class="btn-danger" data-action="delete">Delete</button>
+  <div class="container">
+    <header>
+      <div class="title">
+        <div class="logo" aria-hidden="true">₹</div>
+        <div>
+          <div class="appname">Glide — Expense Tracker</div>
+          <div class="sub">Track, visualize, and control your spending with instant alerts.</div>
         </div>
-      </td>
-    </tr>
-  </template>
+      </div>
+      <div class="flex">
+        <input id="search" placeholder="Search by name/category…" aria-label="Search" />
+        <button class="btn btn-ghost" id="exportBtn" title="Export CSV">Export CSV</button>
+        <button class="btn btn-ghost" id="resetBtn" title="Reset data">Reset</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Form + Table -->
+      <section class="card">
+        <h3>Add Expense</h3>
+        <form id="expenseForm" class="row" autocomplete="off">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" required placeholder="e.g., Coffee at Blue Bottle" />
+          </div>
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <option value="Food & Drinks">Food & Drinks</option>
+              <option value="Groceries">Groceries</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills & Utilities">Bills & Utilities</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="amount">Amount</label>
+            <input id="amount" type="number" min="0" step="0.01" required placeholder="0.00" />
+          </div>
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" type="date" required />
+          </div>
+          <button class="btn" type="submit" style="grid-column: 1 / -1">Add Expense</button>
+        </form>
+
+        <div class="flex" style="margin-top:18px">
+          <h3 style="margin:0">Recent Expenses</h3>
+          <div class="spacer"></div>
+          <div class="muted" id="countLabel">0 items</div>
+        </div>
+
+        <div style="overflow:auto; margin-top:8px">
+          <table aria-label="Expenses table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right: Budget + Stats -->
+      <aside class="card">
+        <h3>Monthly Budget</h3>
+        <div class="flex" style="gap:8px">
+          <input id="budget" type="number" min="0" step="0.01" placeholder="Set your budget (e.g., 20000)" />
+          <button class="btn" id="saveBudget">Save</button>
+        </div>
+        <p class="muted" style="margin:8px 0 14px">Get instant alerts if your spending exceeds the budget.</p>
+        <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+
+        <div class="stats">
+          <div class="card" style="padding:12px">
+            <div class="muted">Budget</div>
+            <div id="statBudget" class="pill">₹0.00</div>
+          </div>
+          <div class="card" style="padding:12px">
+            <div class="muted">Spent</div>
+            <div id="statSpent" class="pill">₹0.00</div>
+          </div>
+          <div class="card" style="padding:12px">
+            <div class="muted">Remaining</div>
+            <div id="statRemain" class="pill ok">₹0.00</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <p class="muted" style="margin:16px 2px 0">Tip: Press <kbd>Enter</kbd> after typing in any field to add quickly. Your data is saved locally in your browser.</p>
+  </div>
 
   <script>
-    /* ===== Utility ===== */
-    const $ = (s, r=document) => r.querySelector(s);
-    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-    const fmt = new Intl.NumberFormat(undefined, { style:'currency', currency: 'INR' });
-
-    const storeKey = 'expense-tracker:v1';
-    const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
-
+    // --- Utilities ---
+    const $$ = (q, c=document) => c.querySelector(q);
+    const $$$ = (q, c=document) => Array.from(c.querySelectorAll(q));
+    const fmt = n => ₹${Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})};
     const todayISO = () => new Date().toISOString().slice(0,10);
 
-    const state = {
-      expenses: [],
-      filters: { category: 'all', from: '', to: '' }
-    };
+    // --- State ---
+    let expenses = JSON.parse(localStorage.getItem('expenses.v1')||'[]');
+    let budget = Number(localStorage.getItem('budget.v1')||0);
 
-    function load() {
-      try {
-        const raw = localStorage.getItem(storeKey);
-        if (raw) state.expenses = JSON.parse(raw);
-      } catch { state.expenses = []; }
-    }
-    function save() {
-      localStorage.setItem(storeKey, JSON.stringify(state.expenses));
-    }
+    // --- Elements ---
+    const form = $$('#expenseForm');
+    const tbody = $$('#tbody');
+    const countLabel = $$('#countLabel');
+    const search = $$('#search');
+    const budgetInp = $$('#budget');
+    const saveBudgetBtn = $$('#saveBudget');
+    const barFill = $$('#barFill');
+    const statBudget = $$('#statBudget');
+    const statSpent = $$('#statSpent');
+    const statRemain = $$('#statRemain');
+    const exportBtn = $$('#exportBtn');
+    const resetBtn = $$('#resetBtn');
 
-    function upsert(exp) {
-      const i = state.expenses.findIndex(e => e.id === exp.id);
-      if (i === -1) state.expenses.push(exp); else state.expenses[i] = exp;
-      save();
-    }
-    function remove(id) {
-      state.expenses = state.expenses.filter(e => e.id !== id);
-      save();
-    }
+    const toastEl = $$('#toast');
+    const toastTitle = $$('#toastTitle');
+    const toastMsg = $$('#toastMsg');
 
-    function applyFilters(list) {
-      const { category, from, to } = state.filters;
-      return list.filter(e => {
-        const okC = category === 'all' || e.category === category;
-        const okF = !from || e.date >= from;
-        const okT = !to || e.date <= to;
-        return okC && okF && okT;
-      }).sort((a,b) => (a.date < b.date ? 1 : -1));
-    }
+    // --- Init ---
+    (function init(){
+      $$('#date').value = todayISO();
+      budgetInp.value = budget || '';
+      render();
+    })();
 
-    function uniqueCategories() {
-      return [...new Set(state.expenses.map(e => e.category))].filter(Boolean).sort((a,b) => a.localeCompare(b));
-    }
-
-    /* ===== Rendering ===== */
-    function renderCategoryOptions() {
-      const select = $('#filter-category');
-      select.innerHTML = '';
-      const allOpt = document.createElement('option');
-      allOpt.value = 'all'; allOpt.textContent = 'All categories';
-      select.appendChild(allOpt);
-      for (const c of uniqueCategories()) {
-        const o = document.createElement('option'); o.value = c; o.textContent = c; select.appendChild(o);
-      }
-      select.value = state.filters.category;
-
-      const dl = $('#category-list');
-      dl.innerHTML = '';
-      uniqueCategories().forEach(c => { const o = document.createElement('option'); o.value = c; dl.appendChild(o); });
-    }
-
-    function renderTable() {
-      const tb = $('#tbody');
-      tb.innerHTML = '';
-      const list = applyFilters(state.expenses);
-      if (!list.length) {
-        tb.innerHTML = '<tr><td colspan="5" class="empty">No expenses match the current filters.</td></tr>';
-        $('#count').textContent = '0';
-        $('#sum-period').textContent = fmt.format(0);
+    // --- Event handlers ---
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = $$('#name').value.trim();
+      const category = $$('#category').value;
+      const amount = Number($$('#amount').value);
+      const date = $$('#date').value || todayISO();
+      if(!name || !amount){
+        showToast('Missing info', 'Please provide a name and amount.', 'danger');
+        alert('Please provide a name and amount.'); // Built-in alert as requested
         return;
       }
-
-      const tpl = $('#row-template');
-      let periodTotal = 0;
-      for (const e of list) {
-        const row = tpl.content.cloneNode(true);
-        row.querySelector('[data-key=date]').textContent = e.date;
-        row.querySelector('[data-key=amount]').textContent = fmt.format(e.amount);
-        row.querySelector('[data-key=category]').innerHTML = `<span class="pill">${e.category}</span>`;
-        row.querySelector('[data-key=description]').textContent = e.description || '';
-        row.querySelector('[data-action=edit]').addEventListener('click', () => startEdit(e.id));
-        row.querySelector('[data-action=delete]').addEventListener('click', () => doDelete(e.id));
-        tb.appendChild(row);
-        periodTotal += Number(e.amount) || 0;
+      const item = { id: crypto.randomUUID(), name, category, amount, date };
+      expenses.unshift(item);
+      persist();
+      form.reset();
+      $$('#date').value = date; // keep same date for speed
+      showToast('Expense added', ${name} • ${fmt(amount)}, 'success');
+      // Budget check alert
+      if (budget && sumSpent() > budget){
+        showToast('Budget exceeded', 'Your spending is over the set budget!', 'danger');
+        alert('Alert: You have exceeded your monthly budget!'); // Built-in alert
       }
-      $('#count').textContent = String(list.length);
-      $('#sum-period').textContent = fmt.format(periodTotal);
-    }
-
-    function renderStatsAllTime() {
-      const total = state.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-      $('#sum-all').textContent = fmt.format(total);
-    }
-
-    function renderMonthlySummary() {
-      const box = $('#monthly');
-      box.innerHTML = '';
-      const map = new Map();
-      for (const e of state.expenses) {
-        const ym = e.date?.slice(0,7) || 'Unknown';
-        map.set(ym, (map.get(ym) || 0) + Number(e.amount || 0));
-      }
-      const entries = [...map.entries()].sort((a,b) => a[0] < b[0] ? 1 : -1);
-      for (const [month, sum] of entries) {
-        const div = document.createElement('div');
-        div.className = 'stat';
-        div.innerHTML = `<div class="label">${month}</div><div class="value">${fmt.format(sum)}</div>`;
-        box.appendChild(div);
-      }
-      if (!entries.length) box.innerHTML = '<div class="empty" style="grid-column: 1/-1;">No data yet.</div>';
-    }
-
-    function renderAll() {
-      renderCategoryOptions();
-      renderTable();
-      renderStatsAllTime();
-      renderMonthlySummary();
-    }
-
-    /* ===== Form actions ===== */
-    function startEdit(id) {
-      const e = state.expenses.find(x => x.id === id);
-      if (!e) return;
-      $('#expense-id').value = e.id;
-      $('#amount').value = e.amount;
-      $('#category').value = e.category;
-      $('#date').value = e.date;
-      $('#description').value = e.description || '';
-      $('#save-btn').textContent = 'Update Expense';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function clearForm() {
-      $('#expense-id').value = '';
-      $('#expense-form').reset();
-      $('#date').value = todayISO();
-      $('#save-btn').textContent = 'Save Expense';
-    }
-
-    function doDelete(id) {
-      if (!confirm('Delete this expense?')) return;
-      remove(id);
-      renderAll();
-    }
-
-    function toCSV(items) {
-      const headers = ['date','amount','category','description','id'];
-      const lines = [headers.join(',')];
-      for (const e of items) {
-        const row = [e.date, e.amount, wrapCSV(e.category), wrapCSV(e.description||''), e.id].join(',');
-        lines.push(row);
-      }
-      return lines.join('\n');
-    }
-    function wrapCSV(s){
-      if (s == null) return '';
-      const needQuotes = /[",\n]/.test(String(s));
-      let out = String(s).replaceAll('"','""');
-      return needQuotes ? `"${out}"` : out;
-    }
-
-    /* ===== Init & Events ===== */
-    document.addEventListener('DOMContentLoaded', () => {
-      load();
-      // Defaults
-      if (!state.expenses.length) $('#date').value = todayISO();
-      else $('#date').value = todayISO();
-
-      // Form submit
-      $('#expense-form').addEventListener('submit', (ev) => {
-        ev.preventDefault();
-        const id = $('#expense-id').value || uid();
-        const amount = Number($('#amount').value);
-        const category = $('#category').value.trim();
-        const date = $('#date').value || todayISO();
-        const description = $('#description').value.trim();
-
-        if (!amount || amount < 0){ alert('Please enter a valid amount'); return; }
-        if (!category){ alert('Please enter a category'); return; }
-
-        upsert({ id, amount, category, date, description });
-        clearForm();
-        renderAll();
-      });
-
-      $('#reset-btn').addEventListener('click', clearForm);
-
-      // Filters
-      $('#apply-filters').addEventListener('click', () => {
-        state.filters.category = $('#filter-category').value || 'all';
-        state.filters.from = $('#from').value;
-        state.filters.to = $('#to').value;
-        renderAll();
-      });
-      $('#clear-filters').addEventListener('click', () => {
-        state.filters = { category: 'all', from: '', to: '' };
-        $('#filter-category').value = 'all';
-        $('#from').value = '';
-        $('#to').value = '';
-        renderAll();
-      });
-
-      // Export CSV
-      $('#export-csv').addEventListener('click', () => {
-        const list = applyFilters(state.expenses);
-        const blob = new Blob([toCSV(list)], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'expenses.csv';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      });
-
-      // Import JSON
-      $('#import-json').addEventListener('change', async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (!Array.isArray(data)) throw new Error('Invalid file: expected an array');
-          // Very light validation
-          const cleaned = data.map(x => ({
-            id: String(x.id || uid()),
-            amount: Number(x.amount) || 0,
-            category: String(x.category || '').slice(0,60),
-            date: (x.date || todayISO()).slice(0,10),
-            description: String(x.description || '').slice(0,160)
-          })).filter(x => x.amount > 0 && x.category);
-          state.expenses = cleaned;
-          save();
-          renderAll();
-          alert('Imported successfully');
-        } catch (err) {
-          console.error(err); alert('Failed to import JSON');
-        } finally {
-          e.target.value = '';
-        }
-      });
-
-      renderAll();
     });
+
+    search.addEventListener('input', render);
+
+    saveBudgetBtn.addEventListener('click', ()=>{
+      budget = Number(budgetInp.value||0);
+      localStorage.setItem('budget.v1', String(budget));
+      render();
+      showToast('Budget saved', New budget is ${fmt(budget)}, 'success');
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      if(!expenses.length){ showToast('Nothing to export', 'Add a few expenses first.'); return }
+      const header = 'Name,Category,Amount,Date\n';
+      const rows = expenses.map(e=>[
+        csvCell(e.name), csvCell(e.category), e.amount, e.date
+      ].join(',')).join('\n');
+      const csv = header + rows;
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = expenses-${new Date().toISOString().slice(0,10)}.csv;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      showToast('Exported', 'Your CSV has been downloaded.', 'success');
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      if(confirm('This will delete all expenses and budget. Continue?')){
+        expenses = []; budget = 0; localStorage.clear(); render();
+        showToast('Reset complete', 'All data cleared.');
+      }
+    });
+
+    function csvCell(val){
+      return '"' + String(val).replaceAll('"','""') + '"';
+    }
+
+    // --- Rendering ---
+    function render(){
+      const q = search.value.trim().toLowerCase();
+      const view = q ? expenses.filter(e=>
+        e.name.toLowerCase().includes(q) || e.category.toLowerCase().includes(q)
+      ) : expenses;
+
+      tbody.innerHTML = '';
+      for(const e of view){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHTML(e.name)}</td>
+          <td><span class="tag">${escapeHTML(e.category)}</span></td>
+          <td><strong>${fmt(e.amount)}</strong></td>
+          <td>${e.date}</td>
+          <td>
+            <div class="actions">
+              <button class="iconbtn" title="Edit" aria-label="Edit">✏</button>
+              <button class="iconbtn" title="Delete" aria-label="Delete">🗑</button>
+            </div>
+          </td>`;
+        const [editBtn, delBtn] = $$$('.iconbtn', tr);
+        editBtn.addEventListener('click', ()=> editExpense(e.id));
+        delBtn.addEventListener('click', ()=> deleteExpense(e.id));
+        tbody.appendChild(tr);
+      }
+
+      countLabel.textContent = ${view.length} item${view.length!==1?'s':''};
+
+      const spent = sumSpent();
+      statBudget.textContent = fmt(budget);
+      statSpent.textContent = fmt(spent);
+      const remain = Math.max(0, budget - spent);
+      statRemain.textContent = budget ? fmt(remain) : fmt(0);
+      statRemain.classList.remove('ok','warn','bad');
+      if(!budget) statRemain.classList.add('ok');
+      else if(spent < budget*0.7) statRemain.classList.add('ok');
+      else if(spent < budget) statRemain.classList.add('warn');
+      else statRemain.classList.add('bad');
+
+      const pct = budget ? Math.min(100, Math.round(spent / budget * 100)) : 0;
+      barFill.style.width = pct + '%';
+    }
+
+    function sumSpent(){ return expenses.reduce((a,b)=> a + Number(b.amount||0), 0) }
+
+    function editExpense(id){
+      const e = expenses.find(x=>x.id===id);
+      if(!e) return;
+      const name = prompt('Edit name', e.name) ?? e.name;
+      const category = prompt('Edit category', e.category) ?? e.category;
+      const amountStr = prompt('Edit amount', e.amount);
+      const amount = Number(amountStr ?? e.amount) || e.amount;
+      const date = prompt('Edit date (YYYY-MM-DD)', e.date) ?? e.date;
+      Object.assign(e, {name, category, amount, date});
+      persist();
+      showToast('Updated', 'Expense edited successfully.', 'success');
+    }
+
+    function deleteExpense(id){
+      const e = expenses.find(x=>x.id===id);
+      if(!e) return;
+      if(confirm(Delete \"${e.name}\"?)){
+        expenses = expenses.filter(x=>x.id!==id);
+        persist();
+        showToast('Deleted', ${e.name} removed.);
+      }
+    }
+
+    function persist(){
+      localStorage.setItem('expenses.v1', JSON.stringify(expenses));
+      render();
+    }
+
+    // --- Alerts / Toasts ---
+    let toastTimer = null;
+    function showToast(title, msg, type){
+      toastTitle.textContent = title || 'Notice';
+      toastMsg.textContent = msg || '';
+      toastEl.className = 'toast show' + (type? (' ' + type):'');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 3600);
+    }
+
+    // Basic HTML escaping for safety
+    function escapeHTML(str){
+      return String(str).replace(/[&<>"]+/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s]));
+    }
   </script>
 </body>
-</html>
+</html
