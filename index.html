@@ -231,7 +231,7 @@
     // --- Utilities ---
     const $$ = (q, c=document) => c.querySelector(q);
     const $$$ = (q, c=document) => Array.from(c.querySelectorAll(q));
-    const fmt = n => ₹${Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})};
+    const fmt = n => `₹${Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}`;
     const todayISO = () => new Date().toISOString().slice(0,10);
 
     // --- State ---
@@ -280,7 +280,7 @@
       persist();
       form.reset();
       $$('#date').value = date; // keep same date for speed
-      showToast('Expense added', ${name} • ${fmt(amount)}, 'success');
+      showToast('Expense added', `${name} • ${fmt(amount)}`, 'success');
       // Budget check alert
       if (budget && sumSpent() > budget){
         showToast('Budget exceeded', 'Your spending is over the set budget!', 'danger');
@@ -294,7 +294,7 @@
       budget = Number(budgetInp.value||0);
       localStorage.setItem('budget.v1', String(budget));
       render();
-      showToast('Budget saved', New budget is ${fmt(budget)}, 'success');
+      showToast('Budget saved', `New budget is ${fmt(budget)}`, 'success');
     });
 
     exportBtn.addEventListener('click', ()=>{
@@ -307,7 +307,7 @@
       const blob = new Blob([csv], {type:'text/csv'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = expenses-${new Date().toISOString().slice(0,10)}.csv;
+      a.href = url; a.download = `expenses-${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
       showToast('Exported', 'Your CSV has been downloaded.', 'success');
@@ -341,8 +341,8 @@
           <td>${e.date}</td>
           <td>
             <div class="actions">
-              <button class="iconbtn" title="Edit" aria-label="Edit">✏</button>
-              <button class="iconbtn" title="Delete" aria-label="Delete">🗑</button>
+              <button class="iconbtn" title="Edit" aria-label="Edit">✏️</button>
+              <button class="iconbtn" title="Delete" aria-label="Delete">🗑️</button>
             </div>
           </td>`;
         const [editBtn, delBtn] = $$$('.iconbtn', tr);
@@ -351,7 +351,7 @@
         tbody.appendChild(tr);
       }
 
-      countLabel.textContent = ${view.length} item${view.length!==1?'s':''};
+      countLabel.textContent = `${view.length} item${view.length!==1?'s':''}`;
 
       const spent = sumSpent();
       statBudget.textContent = fmt(budget);
@@ -386,10 +386,10 @@
     function deleteExpense(id){
       const e = expenses.find(x=>x.id===id);
       if(!e) return;
-      if(confirm(Delete \"${e.name}\"?)){
+      if(confirm(`Delete \"${e.name}\"?`)){
         expenses = expenses.filter(x=>x.id!==id);
         persist();
-        showToast('Deleted', ${e.name} removed.);
+        showToast('Deleted', `${e.name} removed.`);
       }
     }
 
@@ -414,4 +414,4 @@
     }
   </script>
 </body>
-</html
+</html>
